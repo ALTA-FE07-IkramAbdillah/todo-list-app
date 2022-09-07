@@ -4,8 +4,13 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 
 // import file
-import FromComponent from "../component/Form";
+import FromComponent from "../component/FormComponent";
 import CardComponent from "../component/CardComponent";
+
+//Token
+axios.defaults.headers.common = {
+  Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+};
 
 const Homepage = () => {
   // initial state
@@ -54,7 +59,6 @@ const Homepage = () => {
   useEffect(() => {
     getData();
   }, []);
-
   return (
     <>
       <FromComponent todo={todo} setTodo={setTodo} handleChange={handleChange} handleSubmit={handleSubmit} />
