@@ -13,100 +13,91 @@ axios.defaults.headers.common = {
   Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
 };
 
-const Homepage = () => {
-  // initial state
-  const navigate = useNavigate();
-  const [list, setList] = useState([]);
-  const [content, setContent] = useState("");
-
-  const [todo, setTodo] = useState({
+const HomePage = () => {
+  const [todo, setTodo] = useState([]);
+  const [item, setItem] = useState({
     content: "",
     description: "",
   });
 
-  // Fetch API
-  const getData = () => {
-    axios.get("https://api.todoist.com/rest/v1/tasks").then((res) => setList(res.data));
-  };
+  const [edit, setEdit] = useState(false);
+  const navigate = useNavigate();
 
-  //  DetailTodo
-  const handleDetail = (item) => {
-    navigate(`/detail/${item.id}`, {
-      state: {
-        id: item.id,
-        content: item.content,
-      },
-    });
-  };
-
-  //   handle change
-  const handleChange = (e) => {
-    let newItem = { ...todo };
-    newItem[e.target.name] = newItem[e.target.value];
-    setTodo(newItem);
-  };
-
-  //   handle Submit
-  const handleSubmit = (e) => {
-    var axios = require("axios");
-    var data = JSON.stringify({
-      content: "buy-milk",
-      due_string: "tomorrow at 12:00",
-      due_lang: "en",
-      priority: 4,
-    });
-
-    var config = {
-      method: "post",
-      url: "https://api.todoist.com/rest/v1/tasks",
-      headers: {
-        Authorization: "Bearer 7a2e00e09dac7094262b81a9342c37794ec41737",
-        "Content-Type": "application/json",
-        Cookie: "csrf=af132ec405a64b238fd4b99e7c0c6da4",
-      },
-      data: data,
-    };
-
-    axios(config)
-      .then(function (response) {
-        getData();
-        console.log(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
-
-  // handleClear
-  const handleClear = () => {
-    let newItem = { ...todo };
-    newItem["content"] = "";
-    newItem["description"] = "";
-    setTodo(newItem);
-  };
-
-  //   Delete
-  const handleDelete = ({ id }) => {
-    axios.delete(`https://api.todoist.com/rest/v1/tasks/${id}`).then(() => {
-      getData();
-    });
+  //Get API
+  const getApi = () => {
+    axios.get("https://api.todoist.com/rest/v1/tasks").then((respon) => setTodo(respon.data));
   };
 
   useEffect(() => {
-    getData();
+    getApi();
   }, []);
 
-  const changeData = (event) => {
-    setContent(event.target.value);
-    getData();
+  //input data
+  const handleChange = (event) => {
+    let newItem = { ...item };
+    newItem[event.target.name] = event.target.value;
+    setItem(newItem);
+  };
+  //submit data
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (edit) {
+      axios.post(`https://api.todoist.com/rest/v1/tasks/${item.id}`, item).then(() => {
+        getApi();
+        handleClear();
+        setEdit(false);
+      });
+    } else {
+      axios.post(`https://api.todoist.com/rest/v1/tasks/`, item).then(() => {
+        getApi();
+        handleClear();
+      });
+    }
+  };
+
+  //clear data
+  const handleClear = () => {
+    let newItem = {};
+    newItem["content"] = "";
+    newItem["description"] = "";
+    setItem(newItem);
+  };
+
+  //Delete data
+  const handleDelete = ({ id }) => {
+    axios.delete(`https://api.todoist.com/rest/v1/tasks/${id}`).then(() => {
+      getApi();
+    });
+  };
+
+  //edit data
+
+  const handleEdit = ({ id }) => {
+    axios.get(`https://api.todoist.com/rest/v1/tasks/${id}`, item).then((respon) => {
+      console.log(respon.data);
+      setItem(respon.data);
+      setEdit(true);
+    });
+  };
+
+  //Detail
+  const handleDetail = (data) => {
+    navigate("/detail", {
+      state: {
+        content: data.content,
+        description: data.description,
+        id: data.id,
+        url: data.url,
+      },
+    });
   };
 
   return (
-    <>
-      <FromComponent todo={todo} setTodo={setTodo} handleChange={handleChange} handleSubmit={() => handleSubmit()} onChange={changeData} />
-      <CardComponent list={list} setList={setList} handleDetail={handleDetail} handleDelete={handleDelete} />
-    </>
+    <div>
+      <FromComponent item={item} setItem={setItem} handleChange={handleChange} handleSubmit={handleSubmit} />
+      <CardComponent todo={todo} handleDelete={handleDelete} handleEdit={handleEdit} handleDetail={handleDetail} />
+    </div>
   );
 };
 
-export default Homepage;
+export default HomePage;

@@ -1,25 +1,28 @@
-import { Container } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
+import React from "react";
+import { Button, Form, Col, Row } from "react-bootstrap";
 
-const FormComponent = ({ handleChange, todo, handleSubmit }) => {
+const FormComponent = ({ handleChange, item, handleSubmit }) => {
   return (
-    <Container>
-      <Form>
-        <Form.Group className="mb-3" controlId="formBasicTitle">
-          <Form.Label>Title</Form.Label>
-          <Form.Control onChange={handleChange} value={todo.content} name="content" type="title" placeholder="title" />
-        </Form.Group>
+    <div style={{ display: "flex", justifyContent: "center", marginTop: 50 }}>
+      <Form onSubmit={handleSubmit} className="mb-5">
+        <Row>
+          <Col>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label>TODO</Form.Label>
+              <Form.Control required onChange={handleChange} value={item.content} name="content" type="text" placeholder="Enter Whats U Wanna DO" />
+            </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formBasicDescription">
-          <Form.Label>Description</Form.Label>
-          <Form.Control onChange={handleChange} value={todo.description} name="description" type="description" placeholder="description" />
-        </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Label>Deskripsi</Form.Label>
+              <Form.Control style={{ width: 500 }} onChange={handleChange} value={item.description} name="description" type="text" placeholder="Deskripsi" />
+            </Form.Group>
+          </Col>
+        </Row>
+        <Button variant="primary" type="submit">
+          Submit
+        </Button>
       </Form>
-      <Button variant="primary" onClick={handleSubmit}>
-        Submit
-      </Button>
-    </Container>
+    </div>
   );
 };
 
